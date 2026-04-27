@@ -24,7 +24,7 @@ const Ad = sequelize.define('Ad', {
   },
   status: {
     type: DataTypes.STRING,
-    defaultValue: 'active'
+    defaultValue: 'Active' // Active, Paused, Completed, Rejected
   },
   ad_type: {
     type: DataTypes.STRING,
@@ -34,6 +34,10 @@ const Ad = sequelize.define('Ad', {
     type: DataTypes.DECIMAL(10, 2),
     defaultValue: 0
   },
+  remaining_budget: {
+    type: DataTypes.FLOAT,
+    defaultValue: 0
+  },
   video_url: {
     type: DataTypes.TEXT
   },
@@ -41,11 +45,11 @@ const Ad = sequelize.define('Ad', {
     type: DataTypes.STRING,
     defaultValue: 'Learn More'
   },
-  views: {
+  views_count: {
     type: DataTypes.INTEGER,
     defaultValue: 0
   },
-  clicks: {
+  clicks_count: {
     type: DataTypes.INTEGER,
     defaultValue: 0
   },
@@ -59,7 +63,12 @@ const Ad = sequelize.define('Ad', {
 });
 
 // Relationships
+const AdSet = require('./AdSet');
+
 Ad.belongsTo(User, { as: 'creator', foreignKey: 'creator_id' });
 User.hasMany(Ad, { foreignKey: 'creator_id' });
+
+Ad.belongsTo(AdSet, { foreignKey: 'adset_id' });
+AdSet.hasMany(Ad, { foreignKey: 'adset_id' });
 
 module.exports = Ad;

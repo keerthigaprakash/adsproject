@@ -1,7 +1,7 @@
 const Ad = require('../models/Ad');
 
 exports.createAd = async (req, res) => {
-  const { title, description, price, gst, commission, image, ad_type, budget, video_url, cta_text, status } = req.body;
+  const { title, description, price, gst, commission, image, ad_type, budget, video_url, cta_text, status, adset_id } = req.body;
   try {
     const ad = await Ad.create({
       creator_id: req.user.id,
@@ -13,9 +13,11 @@ exports.createAd = async (req, res) => {
       image,
       ad_type: ad_type || 'banner',
       budget: budget || 0,
+      remaining_budget: budget || 0,
       video_url,
       cta_text: cta_text || 'Learn More',
-      status: status || 'active'
+      status: status || 'Active',
+      adset_id
     });
     res.json(ad);
   } catch (err) {
@@ -26,7 +28,17 @@ exports.createAd = async (req, res) => {
 
 exports.getAds = async (req, res) => {
   try {
+    const { status, search, adset_id } = req.query;
+    const where = {};
+    if (status) where.status = status;
+    if (adset_id) where.adset_id = adset_id;
+    if (search) {
+      const { Op } = require('sequelize');
+      where.title = { [Op.iLike]: `%${search}%` };
+    }
+
     const ads = await Ad.findAll({
+      where,
       order: [['created_at', 'DESC']]
     });
     res.json(ads);
@@ -45,22 +57,59 @@ exports.getAdById = async (req, res) => {
   }
 };
 
-exports.trackActivity = async (req, res) => {
-  const { type } = req.body; // 'view' or 'click'
+exports.incrementViews = async (req, res) => {
   try {
     const ad = await Ad.findByPk(req.params.id);
     if (!ad) return res.status(404).json({ message: 'Ad not found' });
-
-    if (type === 'view') {
-      ad.views += 1;
-    } else if (type === 'click') {
-      ad.clicks += 1;
-    }
     
+    if (ad.status !== 'Active') {
+      return res.json(ad);
+    }
+
+    ad.views_count += 1;
+    ad.remaining_budget = (parseFloat(ad.remaining_budget) || 0) - 0.5;
+
+    if (ad.remaining_budget <= 0) {
+      ad.remaining_budget = 0;
+      ad.status = 'Paused';
+    }
+
+    console.log(`[View Tracking] Ad ID: ${ad.id}`);
+    console.log(`[View Tracking] Updated Views: ${ad.views_count}, Remaining Budget: ${ad.remaining_budget}`);
+
     await ad.save();
     res.json(ad);
   } catch (err) {
-    res.status(500).send('Server error');
+    console.error('Error incrementing views:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.incrementClicks = async (req, res) => {
+  try {
+    const ad = await Ad.findByPk(req.params.id);
+    if (!ad) return res.status(404).json({ message: 'Ad not found' });
+    
+    if (ad.status !== 'Active') {
+      return res.json(ad);
+    }
+
+    ad.clicks_count += 1;
+    ad.remaining_budget = (parseFloat(ad.remaining_budget) || 0) - 2;
+
+    if (ad.remaining_budget <= 0) {
+      ad.remaining_budget = 0;
+      ad.status = 'Paused';
+    }
+
+    console.log(`[Click Tracking] Ad ID: ${ad.id}`);
+    console.log(`[Click Tracking] Updated Clicks: ${ad.clicks_count}, Remaining Budget: ${ad.remaining_budget}`);
+
+    await ad.save();
+    res.json(ad);
+  } catch (err) {
+    console.error('Error incrementing clicks:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 

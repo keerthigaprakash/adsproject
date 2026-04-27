@@ -16,11 +16,16 @@ connectDB();
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/ads', require('./routes/adRoutes'));
+app.use('/ads', require('./routes/adRoutes'));
+app.use('/api/campaigns', require('./routes/campaignRoutes'));
+app.use('/api/adsets', require('./routes/adsetRoutes'));
 app.use('/api/requests', require('./routes/requestRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/wallet', require('./routes/walletRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/quotations', require('./routes/quotationRoutes'));
+app.use('/analytics', require('./routes/analyticsRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 app.get('/', (req, res) => {
   res.send('AdPermit API is running...');
