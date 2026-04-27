@@ -62,19 +62,18 @@ exports.incrementViews = async (req, res) => {
     const ad = await Ad.findByPk(req.params.id);
     if (!ad) return res.status(404).json({ message: 'Ad not found' });
     
-    if (ad.status !== 'Active') {
+    if (ad.status && ad.status.toLowerCase() !== 'active') {
       return res.json(ad);
     }
 
-    ad.views_count += 1;
-    ad.remaining_budget = (parseFloat(ad.remaining_budget) || 0) - 0.5;
+    ad.views_count = (ad.views_count || 0) + 1;
+    ad.remaining_budget = Math.max(0, (parseFloat(ad.remaining_budget) || 0) - 0.5);
 
     if (ad.remaining_budget <= 0) {
-      ad.remaining_budget = 0;
       ad.status = 'Paused';
     }
 
-    console.log(`[View Tracking] Ad ID: ${ad.id}`);
+    console.log(`[View Tracking] Ad ID: ${ad.id}, Title: ${ad.title}`);
     console.log(`[View Tracking] Updated Views: ${ad.views_count}, Remaining Budget: ${ad.remaining_budget}`);
 
     await ad.save();
@@ -90,19 +89,18 @@ exports.incrementClicks = async (req, res) => {
     const ad = await Ad.findByPk(req.params.id);
     if (!ad) return res.status(404).json({ message: 'Ad not found' });
     
-    if (ad.status !== 'Active') {
+    if (ad.status && ad.status.toLowerCase() !== 'active') {
       return res.json(ad);
     }
 
-    ad.clicks_count += 1;
-    ad.remaining_budget = (parseFloat(ad.remaining_budget) || 0) - 2;
+    ad.clicks_count = (ad.clicks_count || 0) + 1;
+    ad.remaining_budget = Math.max(0, (parseFloat(ad.remaining_budget) || 0) - 2.0);
 
     if (ad.remaining_budget <= 0) {
-      ad.remaining_budget = 0;
       ad.status = 'Paused';
     }
 
-    console.log(`[Click Tracking] Ad ID: ${ad.id}`);
+    console.log(`[Click Tracking] Ad ID: ${ad.id}, Title: ${ad.title}`);
     console.log(`[Click Tracking] Updated Clicks: ${ad.clicks_count}, Remaining Budget: ${ad.remaining_budget}`);
 
     await ad.save();

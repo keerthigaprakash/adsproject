@@ -19,6 +19,9 @@ const User = sequelize.define('User', {
   role: {
     type: DataTypes.STRING,
     defaultValue: 'Agent'
+  },
+  avatar: {
+    type: DataTypes.TEXT
   }
 }, {
   timestamps: true,

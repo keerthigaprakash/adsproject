@@ -6,7 +6,7 @@ const { auth, checkRole } = require('../middleware/authMiddleware');
 router.post('/', auth, checkRole(['Admin', 'Super Admin']), createAd);
 router.get('/', auth, getAds);
 router.get('/:id', auth, getAdById);
-router.post('/:id/view', incrementViews);
+router.get('/:id/view', incrementViews);
 router.post('/:id/click', incrementClicks);
 router.delete('/:id', auth, checkRole(['Admin', 'Super Admin']), deleteAd);
 

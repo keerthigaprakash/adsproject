@@ -105,7 +105,11 @@ const seedAds = async () => {
 
     // Clear existing ads to avoid duplicates with different types
     await Ad.destroy({ where: {} });
-    await Ad.bulkCreate(ads);
+    const adsWithBudget = ads.map(ad => ({
+      ...ad,
+      remaining_budget: ad.budget
+    }));
+    await Ad.bulkCreate(adsWithBudget);
     console.log('Ads seeded successfully!');
     process.exit();
   } catch (error) {
