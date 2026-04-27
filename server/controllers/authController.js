@@ -19,7 +19,7 @@ exports.register = async (req, res) => {
     await Wallet.create({ user_id: user.id, balance: 0 });
 
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role, avatar: user.avatar } });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
@@ -36,7 +36,7 @@ exports.login = async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role, avatar: user.avatar } });
   } catch (err) {
     res.status(500).send('Server error');
   }
@@ -45,7 +45,7 @@ exports.login = async (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
-      attributes: ['id', 'name', 'email', 'role']
+      attributes: ['id', 'name', 'email', 'role', 'avatar']
     });
     res.json(user);
   } catch (err) {

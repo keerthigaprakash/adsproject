@@ -43,8 +43,8 @@ const seedDatabase = async () => {
     const bcrypt = require('bcryptjs');
 
     const users = [
-      { name: 'Admin', email: 'admin@gmail.com', password: 'admin098', role: 'Admin' },
-      { name: 'Super Admin', email: 'superadmin@gmail.com', password: 'super123', role: 'Super Admin' }
+      { name: 'Admin', email: 'admin@gmail.com', password: 'admin098', role: 'Admin', avatar: 'admin_avatar.png' },
+      { name: 'Super Admin', email: 'superadmin@gmail.com', password: 'super123', role: 'Super Admin', avatar: 'admin_avatar.png' }
     ];
 
     for (const u of users) {
@@ -54,7 +54,13 @@ const seedDatabase = async () => {
         const hashedPassword = await bcrypt.hash(u.password, salt);
         const user = await User.create({ ...u, password: hashedPassword });
         await Wallet.create({ user_id: user.id, balance: 0 });
-        console.log(`✅ Default user created: ${u.role} (${u.email})`);
+        console.log(`✅ Default user created: ${u.role} (${u.email}) with avatar ${u.avatar}`);
+      } else {
+        // Update avatar if user already exists but has no avatar
+        if (u.avatar && !existingUser.avatar) {
+          existingUser.avatar = u.avatar;
+          await existingUser.save();
+        }
       }
     }
 
