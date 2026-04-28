@@ -43,8 +43,15 @@ const seedDatabase = async () => {
     const bcrypt = require('bcryptjs');
 
     const users = [
-      { name: 'Admin', email: 'admin@gmail.com', password: 'admin098', role: 'Admin', avatar: 'admin_avatar.png' },
-      { name: 'Super Admin', email: 'superadmin@gmail.com', password: 'super123', role: 'Super Admin', avatar: 'admin_avatar.png' }
+      { name: 'Admin',       email: 'admin@gmail.com',      password: 'admin098',  role: 'Admin',       avatar: 'admin_avatar.png' },
+      { name: 'Super Admin', email: 'superadmin@gmail.com', password: 'super123',  role: 'Super Admin', avatar: 'admin_avatar.png' },
+      // Agents
+      { name: 'Ravi',    email: 'ravi@gmail.com',    password: '12345',     role: 'Agent' },
+      { name: 'Kavitha', email: 'kavitha@gmail.com', password: '123456',    role: 'Agent' },
+      { name: 'Keerthi', email: 'keerthi@gmail.com', password: '1234567',   role: 'Agent' },
+      { name: 'Mani',    email: 'mani@gmail.com',    password: '12345678',  role: 'Agent' },
+      { name: 'Magi',    email: 'magi@gmail.com',    password: '123456789', role: 'Agent' },
+      { name: 'Sri',     email: 'sri@gmail.com',     password: '123457890', role: 'Agent' },
     ];
 
     for (const u of users) {
@@ -54,7 +61,7 @@ const seedDatabase = async () => {
         const hashedPassword = await bcrypt.hash(u.password, salt);
         const user = await User.create({ ...u, password: hashedPassword });
         await Wallet.create({ user_id: user.id, balance: 0 });
-        console.log(`✅ Default user created: ${u.role} (${u.email}) with avatar ${u.avatar}`);
+        console.log(`✅ Default user created: ${u.role} (${u.email})`);
       } else {
         // Update avatar if user already exists but has no avatar
         if (u.avatar && !existingUser.avatar) {
@@ -63,6 +70,7 @@ const seedDatabase = async () => {
         }
       }
     }
+
 
     const assetVideos = [
       { id: 101, title: 'vd 1', video_url: 'vd1', status: 'Active', price: 1200, budget: 5000, remaining_budget: 5000, description: 'Premium luxury brand showcase.', gst: 18, commission: 10, creator_id: 1 },
@@ -108,9 +116,12 @@ const connectDB = async () => {
     require('../models/Notification');
     require('../models/Quotation');
     require('../models/Request');
+    require('../models/TheatreUser');
+    require('../models/TheatreRequest');
 
     await sequelize.sync({ alter: true });
-    console.log('Database Schema Synchronized');
+    console.log('✅ Database Schema Synchronized & Ready for Data Storage');
+    console.log(`✅ Connected to PostgreSQL Database: ${process.env.DB_NAME} as ${process.env.DB_USER}`);
     
     await seedDatabase();
   } catch (err) {

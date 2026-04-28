@@ -2,13 +2,15 @@ const Campaign = require('../models/Campaign');
 
 exports.createCampaign = async (req, res) => {
   try {
+    console.log('[Campaign Create] ── Received body:', req.body);
     const campaign = await Campaign.create({
       ...req.body,
       creator_id: req.user.id
     });
+    console.log('[Campaign Create] ✅ Successfully saved to DB:', campaign.toJSON());
     res.json(campaign);
   } catch (err) {
-    console.error(err);
+    console.error('[Campaign Create] ❌ Error:', err);
     res.status(500).send('Server error');
   }
 };

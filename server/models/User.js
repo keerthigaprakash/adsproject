@@ -24,6 +24,7 @@ const User = sequelize.define('User', {
     type: DataTypes.TEXT
   }
 }, {
+  tableName: 'users',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: false

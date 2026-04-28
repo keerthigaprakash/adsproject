@@ -17,6 +17,7 @@ const Request = sequelize.define('Request', {
     allowNull: true
   }
 }, {
+  tableName: 'requests',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: false

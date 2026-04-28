@@ -24,6 +24,7 @@ const Analytics = sequelize.define('Analytics', {
     allowNull: false
   }
 }, {
+  tableName: 'analytics',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: false

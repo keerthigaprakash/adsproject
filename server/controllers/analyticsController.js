@@ -4,6 +4,8 @@ const Request = require('../models/Request');
 const User = require('../models/User');
 const { Wallet } = require('../models/Finance');
 const Analytics = require('../models/Analytics');
+const TheatreRequest = require('../models/TheatreRequest');
+const TheatreUser = require('../models/TheatreUser');
 
 exports.getDashboardStats = async (req, res) => {
   try {
@@ -127,5 +129,78 @@ exports.getAnalyticsGraph = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
+  }
+};
+
+exports.getSpendAnalytics = async (req, res) => {
+  try {
+    // 1. Total Ad Spend
+    const totalSpend = await Analytics.sum('spend') || 0;
+
+    // 2. Spend by Agent
+    const spendByAgent = await Analytics.findAll({
+      attributes: [
+        [sequelize.fn('SUM', sequelize.col('spend')), 'total_spend']
+      ],
+      include: [{
+        model: Ad,
+        attributes: ['creator_id'],
+        include: [{
+          model: User,
+          as: 'creator',
+          attributes: ['name']
+        }]
+      }],
+      group: ['Ad.creator_id', 'Ad.creator.id', 'Ad.creator.name'],
+      raw: true,
+      nest: true
+    });
+
+    // 3. Spend by Theatre
+    // Using TheatreRequest because Analytics doesn't have theatre_id
+    const spendByTheatre = await TheatreRequest.findAll({
+      attributes: [
+        'theatre_user_id',
+        [sequelize.fn('SUM', sequelize.col('total_amount')), 'total_spend']
+      ],
+      include: [{
+        model: TheatreUser,
+        as: 'theatre',
+        attributes: ['theatre_name']
+      }],
+      group: ['theatre_user_id', 'theatre.id', 'theatre.theatre_name'],
+      raw: true,
+      nest: true
+    });
+
+    // 4. Spend over Time
+    const spendOverTime = await Analytics.findAll({
+      attributes: [
+        'date',
+        [sequelize.fn('SUM', sequelize.col('spend')), 'total_spend']
+      ],
+      group: ['date'],
+      order: [['date', 'ASC']],
+      raw: true
+    });
+
+    res.json({
+      totalSpend,
+      spendByAgent: spendByAgent.map(item => ({
+        name: item.Ad?.creator?.name || 'Unknown Agent',
+        spend: parseFloat(item.total_spend)
+      })),
+      spendByTheatre: spendByTheatre.map(item => ({
+        name: item.theatre?.theatre_name || 'Unknown Theatre',
+        spend: parseFloat(item.total_spend)
+      })),
+      spendOverTime: spendOverTime.map(item => ({
+        date: item.date,
+        spend: parseFloat(item.total_spend)
+      }))
+    });
+  } catch (err) {
+    console.error('Spend Analytics Error:', err);
+    res.status(500).json({ error: 'Failed to fetch spend analytics' });
   }
 };

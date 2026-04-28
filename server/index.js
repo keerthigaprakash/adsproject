@@ -26,6 +26,9 @@ app.use('/api/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/quotations', require('./routes/quotationRoutes'));
 app.use('/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/theatre-auth', require('./routes/theatreAuthRoutes'));
+app.use('/api/theatre', require('./routes/theatreAuthRoutes'));          // spec alias
+app.use('/api/theatre-requests', require('./routes/theatreRequestRoutes'));
 
 app.get('/', (req, res) => {
   res.send('AdPermit API is running...');

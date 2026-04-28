@@ -16,6 +16,7 @@ const Campaign = sequelize.define('Campaign', {
     defaultValue: 'Active'
   }
 }, {
+  tableName: 'campaigns',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: false

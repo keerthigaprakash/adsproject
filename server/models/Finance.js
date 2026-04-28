@@ -8,6 +8,7 @@ const Wallet = sequelize.define('Wallet', {
     defaultValue: 0
   }
 }, {
+  tableName: 'wallets',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: false
@@ -26,6 +27,7 @@ const Transaction = sequelize.define('Transaction', {
     type: DataTypes.TEXT
   }
 }, {
+  tableName: 'transactions',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: false

@@ -3,6 +3,7 @@ const Ad = require('../models/Ad');
 exports.createAd = async (req, res) => {
   const { title, description, price, gst, commission, image, ad_type, budget, video_url, cta_text, status, adset_id } = req.body;
   try {
+    console.log('[Ad Create] ── Received body:', req.body);
     const ad = await Ad.create({
       creator_id: req.user.id,
       title,
@@ -19,9 +20,10 @@ exports.createAd = async (req, res) => {
       status: status || 'Active',
       adset_id
     });
+    console.log('[Ad Create] ✅ Successfully saved to DB:', ad.toJSON());
     res.json(ad);
   } catch (err) {
-    console.error(err);
+    console.error('[Ad Create] ❌ Error:', err);
     res.status(500).send('Server error');
   }
 };

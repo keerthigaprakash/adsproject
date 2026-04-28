@@ -21,6 +21,7 @@ const Quotation = sequelize.define('Quotation', {
     allowNull: false
   }
 }, {
+  tableName: 'quotations',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: false

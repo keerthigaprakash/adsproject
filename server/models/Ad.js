@@ -57,6 +57,7 @@ const Ad = sequelize.define('Ad', {
     type: DataTypes.TEXT
   }
 }, {
+  tableName: 'ads',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: false

@@ -34,6 +34,7 @@ const AdSet = sequelize.define('AdSet', {
     defaultValue: 'Active'
   }
 }, {
+  tableName: 'ad_sets',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: false
